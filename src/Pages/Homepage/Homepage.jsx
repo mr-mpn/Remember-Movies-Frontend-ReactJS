@@ -1,64 +1,89 @@
 import React from 'react'
-import { useState } from 'react'
-import axios from 'axios'
+import { Link } from 'react-router-dom'
 
+const features = [
+  {
+    icon: '🎬',
+    title: 'Track What You Watch',
+    desc: 'Keep a personal log of every movie you have seen. Never forget a title again.',
+  },
+  {
+    icon: '📋',
+    title: 'Build Your Lists',
+    desc: 'Organise movies into custom lists — favourites, watchlist, hidden gems, whatever you like.',
+  },
+  {
+    icon: '🔗',
+    title: 'Share With Others',
+    desc: 'Share your lists with friends or the world with a single link.',
+  },
+]
 
 const Homepage = () => {
-    const [value, setValue] = useState('')
-  const [imdbRating, setImdbRating] = useState(null)
-
-  const inputHandler = (e) => {
-    setValue(e.target.value)
-  }
-
-  const searchButtonHandler = (e) => {
-    e.preventDefault()
-
-    axios.get(`http://localhost:3000/dev/query-movies?title=${value}`)
-      .then(response => {
-        setImdbRating(response.data?.data?.movie?.imdbRating)
-      })
-      .catch(error => {
-        console.error('Error:', error)
-      })
-  }
-
   return (
-    <div className="max-w-5xl mx-auto px-6 py-16 text-center flex flex-col items-center">
-        
-        <h1 className="text-5xl font-bold mb-10">
-          Search for Movies
+    <div className="flex flex-col items-center">
+
+      {/* Hero */}
+      <section className="w-full flex flex-col items-center justify-center text-center px-6 py-28 bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950">
+        <p className="text-yellow-400 uppercase tracking-widest text-sm font-semibold mb-4">
+          🎥 Your personal movie universe
+        </p>
+        <h1 className="text-6xl font-extrabold leading-tight max-w-3xl mb-6">
+          Discover. Track.{' '}
+          <span className="text-yellow-400">Share.</span>
         </h1>
-
-        <form className="flex gap-3 mb-8">
-          <input
-            type="text"
-            onChange={inputHandler}
-            placeholder="Write the name of the movie"
-            className="bg-gray-900 border border-gray-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-
-          <button
-            type="submit"
-            onClick={searchButtonHandler}
-            className="bg-indigo-600 px-5 py-2 rounded-lg font-medium hover:bg-indigo-700 transition"
+        <p className="text-gray-400 text-xl max-w-xl mb-10">
+          Create lists of movies you have watched or loved, search for any title,
+          and share your taste with the world.
+        </p>
+        <div className="flex gap-4">
+          <Link
+            to="/search"
+            className="bg-yellow-400 text-gray-950 font-bold px-8 py-3 rounded-full hover:bg-yellow-300 transition text-lg"
           >
-            Search
-          </button>
-        </form>
+            Search Movies
+          </Link>
+          <Link
+            to="/login"
+            className="border border-gray-600 text-white px-8 py-3 rounded-full hover:border-gray-400 transition text-lg"
+          >
+            Get Started
+          </Link>
+        </div>
+      </section>
 
-        <p className="text-gray-400">
-          Movie: <span className="text-white font-semibold">{value}</span>
+      {/* Divider */}
+      <div className="w-full h-px bg-gray-800" />
+
+      {/* Features */}
+      <section className="w-full max-w-5xl px-6 py-20 grid grid-cols-1 md:grid-cols-3 gap-10">
+        {features.map((f) => (
+          <div
+            key={f.title}
+            className="bg-gray-900 rounded-2xl p-8 flex flex-col items-center text-center border border-gray-800 hover:border-yellow-400 transition"
+          >
+            <span className="text-5xl mb-4">{f.icon}</span>
+            <h3 className="text-xl font-bold mb-2">{f.title}</h3>
+            <p className="text-gray-400 text-sm leading-relaxed">{f.desc}</p>
+          </div>
+        ))}
+      </section>
+
+      {/* CTA banner */}
+      <section className="w-full bg-yellow-400 text-gray-950 py-16 flex flex-col items-center text-center px-6">
+        <h2 className="text-4xl font-extrabold mb-4">Ready to start your list?</h2>
+        <p className="text-gray-800 mb-8 text-lg">
+          Sign up for free and start tracking movies today.
         </p>
+        <Link
+          to="/login"
+          className="bg-gray-950 text-white font-bold px-8 py-3 rounded-full hover:bg-gray-800 transition text-lg"
+        >
+          Create an Account
+        </Link>
+      </section>
 
-        <p className="text-gray-400 mt-2">
-          IMDB Rating:{" "}
-          <span className="text-yellow-400 font-semibold">
-            {imdbRating ?? '-'}
-          </span>
-        </p>
-
-      </div>
+    </div>
   )
 }
 

@@ -1,17 +1,21 @@
 import React from 'react'
+import { Routes, Route } from 'react-router-dom'
 
 import Navbar from './Components/Navbar/Navbar'
 import Homepage from './Pages/Homepage/Homepage'
+import Search from './Pages/Search/Search'
+import Login from './Pages/Login/Login'
 
 function App() {
   return (
     <div className="min-h-screen bg-gray-950 text-white">
-      
-      {/* Navbar full width */}
       <Navbar />
 
-      {/* Content */}
-      <Homepage/>
+      <Routes>
+        <Route path="/" element={<Homepage />} />
+        <Route path="/search" element={<Search />} />
+        <Route path="/login" element={<Login />} />
+      </Routes>
     </div>
   )
 }

@@ -1,22 +1,35 @@
 import React from 'react'
+import { Link, NavLink } from 'react-router-dom'
 
 const Navbar = () => {
-  return (
-    <nav className="bg-gray-900 text-white px-6 py-4">
-      <div className="relative flex items-center">
-        
-        {/* Center */}
-        <div className="absolute left-1/2 transform -translate-x-1/2">
-          <span className="text-lg font-semibold cursor-pointer">
-            Home
-          </span>
-        </div>
+  const linkClass = ({ isActive }) =>
+    isActive
+      ? 'text-yellow-400 font-semibold transition'
+      : 'text-gray-300 hover:text-white font-semibold transition'
 
-        {/* Right */}
-        <div className="ml-auto">
-          <button className="bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-lg transition">
+  return (
+    <nav className="bg-gray-950 border-b border-gray-800 text-white px-8 py-4">
+      <div className="max-w-5xl mx-auto flex items-center justify-between">
+
+        {/* Logo */}
+        <Link to="/" className="text-yellow-400 text-xl font-extrabold tracking-wide">
+          🎬 CineList
+        </Link>
+
+        {/* Links */}
+        <div className="flex items-center gap-6">
+          <NavLink to="/" end className={linkClass}>
+            Home
+          </NavLink>
+          <NavLink to="/search" className={linkClass}>
+            Search
+          </NavLink>
+          <Link
+            to="/login"
+            className="bg-yellow-400 text-gray-950 font-bold px-4 py-2 rounded-full hover:bg-yellow-300 transition text-sm"
+          >
             Login
-          </button>
+          </Link>
         </div>
 
       </div>
