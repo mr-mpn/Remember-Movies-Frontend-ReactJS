@@ -38,7 +38,7 @@ const Homepage = () => {
     setMovie(null)
 
     axios
-      .get(`${import.meta.env.VITE_API_BASE_URL}/query-movies?title=${encodeURIComponent(query)}`)
+      .get(`${import.meta.env.API_BASE_URL}/query-movies?title=${encodeURIComponent(query)}`)
       .then((res) => {
         if (res.data?.success) {
           setMovie(res.data.data.movie)

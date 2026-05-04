@@ -37,7 +37,7 @@ const Search = () => {
     setMovie(null)
 
     axios
-      .get(`${import.meta.env.VITE_API_BASE_URL}/query-movies?title=${query}`)
+      .get(`${import.meta.env.API_BASE_URL}/query-movies?title=${query}`)
       .then((res) => {
         if (res.data?.success) {
           setMovie(res.data.data.movie)
