@@ -16,9 +16,6 @@ const Navbar = () => {
           <NavLink to="/" end className={linkClass}>
             Home
           </NavLink>
-          <NavLink to="/search" className={linkClass}>
-            Search
-          </NavLink>
         </div>
 
         {/* Centered logo */}

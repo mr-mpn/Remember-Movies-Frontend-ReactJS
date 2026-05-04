@@ -1,6 +1,8 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
+import axios from 'axios'
 import TestimonialMarquee from '../../Components/Marquee/TestimonialMarquee'
+import MovieModal from '../../Components/MovieModal/MovieModal'
 
 const features = [
   {
@@ -21,6 +23,32 @@ const features = [
 ]
 
 const Homepage = () => {
+  const [query, setQuery]   = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError]   = useState(null)
+  const [movie, setMovie]   = useState(null)
+
+  const handleSearch = (e) => {
+    e.preventDefault()
+    if (!query.trim()) return
+
+    setLoading(true)
+    setError(null)
+    setMovie(null)
+
+    axios
+      .get(`${import.meta.env.VITE_API_BASE_URL}/query-movies?title=${encodeURIComponent(query)}`)
+      .then((res) => {
+        if (res.data?.success) {
+          setMovie(res.data.data.movie)
+        } else {
+          setError(res.data?.error?.message || 'Movie not found.')
+        }
+      })
+      .catch(() => setError('Could not reach the server. Is the backend running?'))
+      .finally(() => setLoading(false))
+  }
+
   return (
     <div className="flex flex-col items-center">
 
@@ -38,12 +66,12 @@ const Homepage = () => {
           and share your taste with the world.
         </p>
         <div className="flex gap-4">
-          <Link
-            to="/search"
+          <a
+            href="#search"
             className="bg-yellow-400 text-gray-950 font-bold px-8 py-3 rounded-full hover:bg-yellow-300 transition text-lg"
           >
             Search Movies
-          </Link>
+          </a>
           <Link
             to="/login"
             className="border border-gray-600 text-white px-8 py-3 rounded-full hover:border-gray-400 transition text-lg"
@@ -70,9 +98,51 @@ const Homepage = () => {
         ))}
       </section>
 
-      {/* Testimonials */}
+      {/* Trending marquee */}
       <div className="w-full h-px bg-gray-800" />
       <TestimonialMarquee />
+
+      {/* Search section */}
+      <div className="w-full h-px bg-gray-800" />
+      <section id="search" className="w-full max-w-3xl px-6 py-20 flex flex-col items-center text-center">
+        <p className="text-yellow-400 uppercase tracking-widest text-sm font-semibold mb-3">
+          Find any movie
+        </p>
+        <h2 className="text-4xl font-extrabold mb-3">
+          Search <span className="text-yellow-400">Movies</span>
+        </h2>
+        <p className="text-gray-400 mb-10">
+          Get full details — ratings, cast, plot, awards and more.
+        </p>
+
+        <form onSubmit={handleSearch} className="flex w-full max-w-xl gap-3">
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="e.g. Inception, The Godfather..."
+            className="flex-1 bg-gray-900 border border-gray-700 text-white rounded-full px-6 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-400 placeholder-gray-500"
+          />
+          <button
+            type="submit"
+            className="bg-yellow-400 text-gray-950 font-bold px-6 py-3 rounded-full hover:bg-yellow-300 transition"
+          >
+            {loading ? '...' : 'Search'}
+          </button>
+        </form>
+
+        {error && (
+          <div className="mt-6 bg-red-900/40 border border-red-700 text-red-300 rounded-xl px-6 py-4">
+            {error}
+          </div>
+        )}
+      </section>
+
+      {/* Movie modal */}
+      {movie && <MovieModal movie={movie} onClose={() => setMovie(null)} />}
+
+      {/* Divider */}
+      <div className="w-full h-px bg-gray-800" />
 
       {/* CTA banner */}
       <section className="w-full bg-yellow-400 text-gray-950 py-16 flex flex-col items-center text-center px-6">

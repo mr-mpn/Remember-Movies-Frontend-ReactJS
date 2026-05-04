@@ -3,7 +3,6 @@ import { Routes, Route } from 'react-router-dom'
 
 import Navbar from './Components/Navbar/Navbar'
 import Homepage from './Pages/Homepage/Homepage'
-import Search from './Pages/Search/Search'
 import Login from './Pages/Login/Login'
 import Lists from './Pages/Lists/Lists'
 
@@ -14,7 +13,6 @@ function App() {
 
       <Routes>
         <Route path="/" element={<Homepage />} />
-        <Route path="/search" element={<Search />} />
         <Route path="/login" element={<Login />} />
         <Route path="/lists" element={<Lists />} />
       </Routes>
