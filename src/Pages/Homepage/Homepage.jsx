@@ -23,10 +23,11 @@ const features = [
 ]
 
 const Homepage = () => {
-  const [query, setQuery]   = useState('')
+  const [query, setQuery]     = useState('')
   const [loading, setLoading] = useState(false)
-  const [error, setError]   = useState(null)
-  const [movie, setMovie]   = useState(null)
+  const [error, setError]     = useState(null)
+  const [movie, setMovie]     = useState(null)
+  const [gated, setGated]     = useState(() => !!localStorage.getItem('cl_searched'))
 
   const handleSearch = (e) => {
     e.preventDefault()
@@ -41,6 +42,9 @@ const Homepage = () => {
       .then((res) => {
         if (res.data?.success) {
           setMovie(res.data.data.movie)
+          // Mark that the free search has been used
+          localStorage.setItem('cl_searched', 'true')
+          setGated(true)
         } else {
           setError(res.data?.error?.message || 'Movie not found.')
         }
@@ -115,21 +119,47 @@ const Homepage = () => {
           Get full details — ratings, cast, plot, awards and more.
         </p>
 
-        <form onSubmit={handleSearch} className="flex w-full max-w-xl gap-3">
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="e.g. Inception, The Godfather..."
-            className="flex-1 bg-gray-900 border border-gray-700 text-white rounded-full px-6 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-400 placeholder-gray-500"
-          />
-          <button
-            type="submit"
-            className="bg-yellow-400 text-gray-950 font-bold px-6 py-3 rounded-full hover:bg-yellow-300 transition"
-          >
-            {loading ? '...' : 'Search'}
-          </button>
-        </form>
+        {gated ? (
+          /* Gate — shown after the free search is used */
+          <div className="w-full max-w-xl bg-gray-900 border border-yellow-400/40 rounded-2xl px-8 py-10 flex flex-col items-center gap-4">
+            <span className="text-5xl">🔒</span>
+            <h3 className="text-2xl font-extrabold">You've used your free search</h3>
+            <p className="text-gray-400 text-sm max-w-sm">
+              Sign in or create a free account to unlock unlimited searches, build lists, and share them with others.
+            </p>
+            <div className="flex gap-3 mt-2">
+              <Link
+                to="/login"
+                className="bg-yellow-400 text-gray-950 font-bold px-6 py-2.5 rounded-full hover:bg-yellow-300 transition"
+              >
+                Sign In
+              </Link>
+              <Link
+                to="/login"
+                className="border border-gray-600 text-white px-6 py-2.5 rounded-full hover:border-gray-400 transition"
+              >
+                Create Account
+              </Link>
+            </div>
+          </div>
+        ) : (
+          /* Search form */
+          <form onSubmit={handleSearch} className="flex w-full max-w-xl gap-3">
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="e.g. Inception, The Godfather..."
+              className="flex-1 bg-gray-900 border border-gray-700 text-white rounded-full px-6 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-400 placeholder-gray-500"
+            />
+            <button
+              type="submit"
+              className="bg-yellow-400 text-gray-950 font-bold px-6 py-3 rounded-full hover:bg-yellow-300 transition"
+            >
+              {loading ? '...' : 'Search'}
+            </button>
+          </form>
+        )}
 
         {error && (
           <div className="mt-6 bg-red-900/40 border border-red-700 text-red-300 rounded-xl px-6 py-4">
