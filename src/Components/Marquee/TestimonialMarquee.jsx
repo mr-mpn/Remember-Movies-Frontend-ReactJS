@@ -8,7 +8,7 @@ const TestimonialMarquee = () => {
 
   useEffect(() => {
     axios
-      .get(`${import.meta.env.API_BASE_URL}/trending`)
+      .get(`${import.meta.env.VITE_API_BASE_URL}/trending`)
       .then((res) => {
         if (res.data?.success) {
           setMovies(res.data.data.movies.filter((m) => m.poster && m.poster !== 'N/A'))
