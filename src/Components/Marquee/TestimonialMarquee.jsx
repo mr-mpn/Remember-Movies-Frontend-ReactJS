@@ -26,7 +26,7 @@ const TestimonialMarquee = () => {
     <>
       <section className="w-full py-16 bg-gray-950 overflow-hidden">
         <p className="text-center text-yellow-400 uppercase tracking-widest text-sm font-semibold mb-10">
-          Trending on CineList
+          Trending on Cinema List
         </p>
 
         <div className="relative flex">
