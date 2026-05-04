@@ -1,5 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import TestimonialMarquee from '../../Components/Marquee/TestimonialMarquee'
 
 const features = [
   {
@@ -68,6 +69,10 @@ const Homepage = () => {
           </div>
         ))}
       </section>
+
+      {/* Testimonials */}
+      <div className="w-full h-px bg-gray-800" />
+      <TestimonialMarquee />
 
       {/* CTA banner */}
       <section className="w-full bg-yellow-400 text-gray-950 py-16 flex flex-col items-center text-center px-6">

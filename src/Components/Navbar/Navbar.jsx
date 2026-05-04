@@ -9,20 +9,30 @@ const Navbar = () => {
 
   return (
     <nav className="bg-gray-950 border-b border-gray-800 text-white px-8 py-4">
-      <div className="max-w-5xl mx-auto flex items-center justify-between">
+      <div className="max-w-6xl mx-auto flex items-center">
 
-        {/* Logo */}
-        <Link to="/" className="text-yellow-400 text-xl font-extrabold tracking-wide">
-          🎬 CineList
-        </Link>
-
-        {/* Links */}
-        <div className="flex items-center gap-6">
+        {/* Left links */}
+        <div className="flex items-center gap-8 flex-1">
           <NavLink to="/" end className={linkClass}>
             Home
           </NavLink>
           <NavLink to="/search" className={linkClass}>
             Search
+          </NavLink>
+        </div>
+
+        {/* Centered logo */}
+        <Link
+          to="/"
+          className="text-yellow-400 text-xl font-extrabold tracking-wide whitespace-nowrap"
+        >
+          🎬 Cinema List
+        </Link>
+
+        {/* Right links */}
+        <div className="flex items-center gap-8 flex-1 justify-end">
+          <NavLink to="/lists" className={linkClass}>
+            My Lists
           </NavLink>
           <Link
             to="/login"
