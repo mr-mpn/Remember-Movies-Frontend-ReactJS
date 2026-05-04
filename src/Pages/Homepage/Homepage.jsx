@@ -49,7 +49,7 @@ const Homepage = () => {
           setError(res.data?.error?.message || 'Movie not found.')
         }
       })
-      .catch(() => setError('Could not reach the server. Is the backend running?'))
+      .catch(() => setError('Could not reach the server.'))
       .finally(() => setLoading(false))
   }
 
