@@ -27,7 +27,11 @@ const Homepage = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError]     = useState(null)
   const [movie, setMovie]     = useState(null)
-  const [gated, setGated]     = useState(() => !!localStorage.getItem('cl_searched'))
+  const isLoggedIn = !!localStorage.getItem('cl_token')
+  const [gated, setGated]     = useState(() => {
+    if (isLoggedIn) return false
+    return !!localStorage.getItem('cl_searched')
+  })
 
   const handleSearch = (e) => {
     e.preventDefault()
@@ -76,12 +80,14 @@ const Homepage = () => {
           >
             Search Movies
           </a>
-          <Link
-            to="/login"
-            className="border border-gray-600 text-white px-8 py-3 rounded-full hover:border-gray-400 transition text-lg"
-          >
-            Get Started
-          </Link>
+          {!isLoggedIn && (
+            <Link
+              to="/login"
+              className="border border-gray-600 text-white px-8 py-3 rounded-full hover:border-gray-400 transition text-lg"
+            >
+              Get Started
+            </Link>
+          )}
         </div>
       </section>
 
@@ -119,8 +125,23 @@ const Homepage = () => {
           Get full details — ratings, cast, plot, awards and more.
         </p>
 
-        {gated ? (
-          /* Gate — shown after the free search is used */
+        {isLoggedIn ? (
+          /* Logged in — redirect to My Lists */
+          <div className="w-full max-w-xl bg-gray-900 border border-yellow-400/40 rounded-2xl px-8 py-10 flex flex-col items-center gap-4">
+            <span className="text-5xl">🎬</span>
+            <h3 className="text-2xl font-extrabold">Head to My Lists</h3>
+            <p className="text-gray-400 text-sm max-w-sm">
+              Search for unlimited movies, create lists, and organise your favourites — all from your personal space.
+            </p>
+            <Link
+              to="/lists"
+              className="bg-yellow-400 text-gray-950 font-bold px-6 py-2.5 rounded-full hover:bg-yellow-300 transition mt-2"
+            >
+              Go to My Lists
+            </Link>
+          </div>
+        ) : gated ? (
+          /* Not logged in + free search used */
           <div className="w-full max-w-xl bg-gray-900 border border-yellow-400/40 rounded-2xl px-8 py-10 flex flex-col items-center gap-4">
             <span className="text-5xl">🔒</span>
             <h3 className="text-2xl font-extrabold">You've used your free search</h3>
@@ -143,7 +164,7 @@ const Homepage = () => {
             </div>
           </div>
         ) : (
-          /* Search form */
+          /* Not logged in + free search available */
           <form onSubmit={handleSearch} className="flex w-full max-w-xl gap-3">
             <input
               type="text"
