@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import axios from 'axios'
 import TestimonialMarquee from '../../Components/Marquee/TestimonialMarquee'
 import MovieModal from '../../Components/MovieModal/MovieModal'
+import { addRecentMovie } from '../../utils/recentMovies'
 
 const features = [
   {
@@ -46,9 +47,11 @@ const Homepage = () => {
       .then((res) => {
         if (res.data?.success) {
           setMovie(res.data.data.movie)
-          // Mark that the free search has been used
-          localStorage.setItem('cl_searched', 'true')
-          setGated(true)
+          addRecentMovie(res.data.data.movie)
+          if (!isLoggedIn) {
+            localStorage.setItem('cl_searched', 'true')
+            setGated(true)
+          }
         } else {
           setError(res.data?.error?.message || 'Movie not found.')
         }
@@ -60,36 +63,66 @@ const Homepage = () => {
   return (
     <div className="flex flex-col items-center">
 
-      {/* Hero */}
-      <section className="w-full flex flex-col items-center justify-center text-center px-6 py-28 bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950">
+      {/* Hero with search bar */}
+      <section className="w-full flex flex-col items-center justify-center text-center px-6 py-24 bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950">
         <p className="text-yellow-400 uppercase tracking-widest text-sm font-semibold mb-4">
           🎥 Your personal movie universe
         </p>
-        <h1 className="text-6xl font-extrabold leading-tight max-w-3xl mb-6">
+        <h1 className="text-5xl md:text-6xl font-extrabold leading-tight max-w-3xl mb-6">
           Discover. Track.{' '}
           <span className="text-yellow-400">Share.</span>
         </h1>
-        <p className="text-gray-400 text-xl max-w-xl mb-10">
+        <p className="text-gray-400 text-lg max-w-xl mb-10">
           Create lists of movies you have watched or loved, search for any title,
           and share your taste with the world.
         </p>
-        <div className="flex gap-4">
-          <a
-            href="#search"
-            className="bg-yellow-400 text-gray-950 font-bold px-8 py-3 rounded-full hover:bg-yellow-300 transition text-lg"
-          >
-            Search Movies
-          </a>
-          {!isLoggedIn && (
+
+        {/* Search bar in hero */}
+        {gated ? (
+          <div className="w-full max-w-xl bg-gray-900/80 border border-yellow-400/40 rounded-2xl px-6 py-8 flex flex-col items-center gap-3">
+            <span className="text-4xl">🔒</span>
+            <p className="text-white font-bold">You've used your free search</p>
+            <p className="text-gray-400 text-sm">Sign in to unlock unlimited searches.</p>
             <Link
               to="/login"
-              className="border border-gray-600 text-white px-8 py-3 rounded-full hover:border-gray-400 transition text-lg"
+              className="bg-yellow-400 text-gray-950 font-bold px-6 py-2.5 rounded-full hover:bg-yellow-300 transition mt-1"
             >
-              Get Started
+              Sign In with Google
             </Link>
-          )}
-        </div>
+          </div>
+        ) : (
+          <form onSubmit={handleSearch} className="flex w-full max-w-xl gap-3">
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search any movie..."
+              className="flex-1 bg-gray-900 border border-gray-700 text-white rounded-full px-6 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-400 placeholder-gray-500"
+            />
+            <button
+              type="submit"
+              className="bg-yellow-400 text-gray-950 font-bold px-6 py-3 rounded-full hover:bg-yellow-300 transition"
+            >
+              {loading ? '...' : 'Search'}
+            </button>
+          </form>
+        )}
+
+        {!isLoggedIn && !gated && (
+          <p className="text-gray-600 text-xs mt-3">
+            1 free search available · <Link to="/login" className="text-yellow-400 hover:underline">Sign in</Link> for unlimited
+          </p>
+        )}
+
+        {error && (
+          <div className="mt-4 bg-red-900/40 border border-red-700 text-red-300 rounded-xl px-6 py-3 text-sm">
+            {error}
+          </div>
+        )}
       </section>
+
+      {/* Movie modal */}
+      {movie && <MovieModal movie={movie} onClose={() => setMovie(null)} />}
 
       {/* Divider */}
       <div className="w-full h-px bg-gray-800" />
@@ -112,102 +145,37 @@ const Homepage = () => {
       <div className="w-full h-px bg-gray-800" />
       <TestimonialMarquee />
 
-      {/* Search section */}
-      <div className="w-full h-px bg-gray-800" />
-      <section id="search" className="w-full max-w-3xl px-6 py-20 flex flex-col items-center text-center">
-        <p className="text-yellow-400 uppercase tracking-widest text-sm font-semibold mb-3">
-          Find any movie
-        </p>
-        <h2 className="text-4xl font-extrabold mb-3">
-          Search <span className="text-yellow-400">Movies</span>
-        </h2>
-        <p className="text-gray-400 mb-10">
-          Get full details — ratings, cast, plot, awards and more.
-        </p>
-
-        {isLoggedIn ? (
-          /* Logged in — redirect to My Lists */
-          <div className="w-full max-w-xl bg-gray-900 border border-yellow-400/40 rounded-2xl px-8 py-10 flex flex-col items-center gap-4">
-            <span className="text-5xl">🎬</span>
-            <h3 className="text-2xl font-extrabold">Head to My Lists</h3>
-            <p className="text-gray-400 text-sm max-w-sm">
-              Search for unlimited movies, create lists, and organise your favourites — all from your personal space.
-            </p>
-            <Link
-              to="/lists"
-              className="bg-yellow-400 text-gray-950 font-bold px-6 py-2.5 rounded-full hover:bg-yellow-300 transition mt-2"
-            >
-              Go to My Lists
-            </Link>
-          </div>
-        ) : gated ? (
-          /* Not logged in + free search used */
-          <div className="w-full max-w-xl bg-gray-900 border border-yellow-400/40 rounded-2xl px-8 py-10 flex flex-col items-center gap-4">
-            <span className="text-5xl">🔒</span>
-            <h3 className="text-2xl font-extrabold">You've used your free search</h3>
-            <p className="text-gray-400 text-sm max-w-sm">
-              Sign in or create a free account to unlock unlimited searches, build lists, and share them with others.
-            </p>
-            <div className="flex gap-3 mt-2">
-              <Link
-                to="/login"
-                className="bg-yellow-400 text-gray-950 font-bold px-6 py-2.5 rounded-full hover:bg-yellow-300 transition"
-              >
-                Sign In
-              </Link>
-              <Link
-                to="/login"
-                className="border border-gray-600 text-white px-6 py-2.5 rounded-full hover:border-gray-400 transition"
-              >
-                Create Account
-              </Link>
-            </div>
-          </div>
-        ) : (
-          /* Not logged in + free search available */
-          <form onSubmit={handleSearch} className="flex w-full max-w-xl gap-3">
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="e.g. Inception, The Godfather..."
-              className="flex-1 bg-gray-900 border border-gray-700 text-white rounded-full px-6 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-400 placeholder-gray-500"
-            />
-            <button
-              type="submit"
-              className="bg-yellow-400 text-gray-950 font-bold px-6 py-3 rounded-full hover:bg-yellow-300 transition"
-            >
-              {loading ? '...' : 'Search'}
-            </button>
-          </form>
-        )}
-
-        {error && (
-          <div className="mt-6 bg-red-900/40 border border-red-700 text-red-300 rounded-xl px-6 py-4">
-            {error}
-          </div>
-        )}
-      </section>
-
-      {/* Movie modal */}
-      {movie && <MovieModal movie={movie} onClose={() => setMovie(null)} />}
-
       {/* Divider */}
       <div className="w-full h-px bg-gray-800" />
 
-      {/* CTA banner */}
-      <section className="w-full bg-yellow-400 text-gray-950 py-16 flex flex-col items-center text-center px-6">
-        <h2 className="text-4xl font-extrabold mb-4">Ready to start your list?</h2>
-        <p className="text-gray-800 mb-8 text-lg">
-          Sign up for free and start tracking movies today.
-        </p>
-        <Link
-          to="/login"
-          className="bg-gray-950 text-white font-bold px-8 py-3 rounded-full hover:bg-gray-800 transition text-lg"
-        >
-          Create an Account
-        </Link>
-      </section>
+      {/* CTA banner — different for logged in vs not */}
+      {isLoggedIn ? (
+        <section className="w-full bg-gray-900 py-16 flex flex-col items-center text-center px-6">
+          <h2 className="text-3xl font-extrabold mb-4 text-white">Your lists are waiting</h2>
+          <p className="text-gray-400 mb-8 text-lg">
+            Organise your favourites, build watchlists, and share them.
+          </p>
+          <Link
+            to="/lists"
+            className="bg-yellow-400 text-gray-950 font-bold px-8 py-3 rounded-full hover:bg-yellow-300 transition text-lg"
+          >
+            Go to My Lists
+          </Link>
+        </section>
+      ) : (
+        <section className="w-full bg-yellow-400 text-gray-950 py-16 flex flex-col items-center text-center px-6">
+          <h2 className="text-4xl font-extrabold mb-4">Ready to start your list?</h2>
+          <p className="text-gray-800 mb-8 text-lg">
+            Sign up for free and start tracking movies today.
+          </p>
+          <Link
+            to="/login"
+            className="bg-gray-950 text-white font-bold px-8 py-3 rounded-full hover:bg-gray-800 transition text-lg"
+          >
+            Create an Account
+          </Link>
+        </section>
+      )}
 
     </div>
   )

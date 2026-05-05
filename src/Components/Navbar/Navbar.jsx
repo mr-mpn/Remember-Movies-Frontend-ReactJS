@@ -29,9 +29,7 @@ const Navbar = () => {
   const handleLogout = () => {
     localStorage.removeItem('cl_token')
     localStorage.removeItem('cl_user')
-    setUser(null)
-    window.dispatchEvent(new Event('cl_auth_change'))
-    navigate('/')
+    window.location.href = '/'
   }
 
   const linkClass = ({ isActive }) =>
