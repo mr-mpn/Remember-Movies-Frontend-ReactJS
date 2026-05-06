@@ -1,5 +1,5 @@
 const STORAGE_KEY = 'cl_recent'
-const MAX_RECENT = 10
+const MAX_RECENT = 5
 
 /**
  * Get the list of recently searched movies from localStorage.
