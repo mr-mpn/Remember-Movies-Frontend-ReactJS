@@ -1,18 +1,15 @@
 import React, { useState, useEffect } from 'react'
-import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 
 const Navbar = () => {
-  const navigate = useNavigate()
   const [user, setUser] = useState(null)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
     const stored = localStorage.getItem('cl_user')
-    if (stored) {
-      setUser(JSON.parse(stored))
-    }
+    if (stored) setUser(JSON.parse(stored))
   }, [])
 
-  // Listen for storage changes (login/logout from other components)
   useEffect(() => {
     const handleStorage = () => {
       const stored = localStorage.getItem('cl_user')
@@ -38,26 +35,35 @@ const Navbar = () => {
       : 'text-gray-300 hover:text-white font-semibold transition'
 
   return (
-    <nav className="bg-gray-950 border-b border-gray-800 text-white px-8 py-4">
+    <nav className="bg-gray-950 border-b border-gray-800 text-white px-6 md:px-8 py-4 relative">
       <div className="max-w-6xl mx-auto flex items-center">
 
-        {/* Left links */}
-        <div className="flex items-center gap-8 flex-1">
+        {/* Left links (desktop) */}
+        <div className="hidden md:flex items-center gap-8 flex-1">
           <NavLink to="/" end className={linkClass}>
             Home
           </NavLink>
         </div>
 
+        {/* Hamburger (mobile) */}
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          className="md:hidden text-gray-300 hover:text-white text-2xl mr-4"
+          aria-label="Toggle menu"
+        >
+          {menuOpen ? '✕' : '☰'}
+        </button>
+
         {/* Centered logo */}
         <Link
           to="/"
-          className="text-yellow-400 text-xl font-extrabold tracking-wide whitespace-nowrap"
+          className="text-yellow-400 text-lg md:text-xl font-extrabold tracking-wide whitespace-nowrap"
         >
           🎬 Cinema List
         </Link>
 
-        {/* Right links */}
-        <div className="flex items-center gap-8 flex-1 justify-end">
+        {/* Right links (desktop) */}
+        <div className="hidden md:flex items-center gap-8 flex-1 justify-end">
           {user && (
             <NavLink to="/lists" className={linkClass}>
               My Lists
@@ -73,7 +79,7 @@ const Navbar = () => {
                   className="w-8 h-8 rounded-full border-2 border-yellow-400"
                 />
               )}
-              <span className="text-sm font-semibold hidden sm:inline">{user.name}</span>
+              <span className="text-sm font-semibold">{user.name}</span>
               <button
                 onClick={handleLogout}
                 className="text-gray-400 hover:text-white text-sm transition"
@@ -91,7 +97,38 @@ const Navbar = () => {
           )}
         </div>
 
+        {/* Mobile spacer */}
+        <div className="md:hidden flex-1" />
       </div>
+
+      {/* Mobile menu dropdown */}
+      {menuOpen && (
+        <div className="md:hidden absolute top-full left-0 w-full bg-gray-950 border-b border-gray-800 px-6 py-4 flex flex-col gap-4 z-40">
+          <NavLink to="/" end className={linkClass} onClick={() => setMenuOpen(false)}>
+            Home
+          </NavLink>
+          {user && (
+            <NavLink to="/lists" className={linkClass} onClick={() => setMenuOpen(false)}>
+              My Lists
+            </NavLink>
+          )}
+          {user ? (
+            <div className="flex items-center gap-3 pt-2 border-t border-gray-800">
+              {user.picture && (
+                <img src={user.picture} alt={user.name} className="w-8 h-8 rounded-full border-2 border-yellow-400" />
+              )}
+              <span className="text-sm font-semibold">{user.name}</span>
+              <button onClick={handleLogout} className="text-gray-400 hover:text-white text-sm ml-auto">
+                Logout
+              </button>
+            </div>
+          ) : (
+            <Link to="/login" className="bg-yellow-400 text-gray-950 font-bold px-4 py-2 rounded-full text-center text-sm" onClick={() => setMenuOpen(false)}>
+              Login
+            </Link>
+          )}
+        </div>
+      )}
     </nav>
   )
 }

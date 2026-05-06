@@ -91,7 +91,7 @@ const Homepage = () => {
             </Link>
           </div>
         ) : (
-          <form onSubmit={handleSearch} className="flex w-full max-w-xl gap-3">
+          <form onSubmit={handleSearch} className="flex flex-col sm:flex-row w-full max-w-xl gap-3">
             <input
               type="text"
               value={query}
@@ -109,7 +109,7 @@ const Homepage = () => {
         )}
 
         {!isLoggedIn && !gated && (
-          <p className="text-gray-600 text-xs mt-3">
+          <p className="text-gray-400 text-xs mt-3">
             1 free search available · <Link to="/login" className="text-yellow-400 hover:underline">Sign in</Link> for unlimited
           </p>
         )}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import AddToListPopup from '../AddToListPopup/AddToListPopup'
 
 const RatingBadge = ({ label, value, color }) => (
@@ -12,7 +12,7 @@ const InfoRow = ({ icon, label, value }) => {
   if (!value || value === 'N/A') return null
   return (
     <div className="flex gap-3 items-start">
-      <span className="text-xl mt-0.5">{icon}</span>
+      <span className="text-xl mt-0.5" aria-hidden="true">{icon}</span>
       <div>
         <span className="text-gray-400 text-sm">{label}</span>
         <p className="text-white text-sm font-medium">{value}</p>
@@ -23,11 +23,26 @@ const InfoRow = ({ icon, label, value }) => {
 
 const MovieModal = ({ movie, onClose, onRemove }) => {
   const [showAddToList, setShowAddToList] = useState(false)
+  const [confirmRemove, setConfirmRemove] = useState(false)
   const isLoggedIn = !!localStorage.getItem('cl_token')
+  const modalRef = useRef(null)
+
+  // Escape key to close
+  useEffect(() => {
+    const handleKey = (e) => {
+      if (e.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', handleKey)
+    return () => document.removeEventListener('keydown', handleKey)
+  }, [onClose])
+
+  // Focus trap
+  useEffect(() => {
+    if (modalRef.current) modalRef.current.focus()
+  }, [])
 
   if (!movie) return null
 
-  // Use MongoDB _id if available, fall back to imdbID
   const movieId = movie._id || movie.imdbID
 
   return (
@@ -39,7 +54,9 @@ const MovieModal = ({ movie, onClose, onRemove }) => {
       >
         {/* Modal panel */}
         <div
-          className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl flex flex-col md:flex-row"
+          ref={modalRef}
+          tabIndex={-1}
+          className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl flex flex-col md:flex-row outline-none"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Close button */}
@@ -54,7 +71,7 @@ const MovieModal = ({ movie, onClose, onRemove }) => {
           {/* Action button: remove (red) or add (yellow) */}
           {isLoggedIn && movieId && onRemove && (
             <button
-              onClick={onRemove}
+              onClick={() => setConfirmRemove(true)}
               className="absolute top-4 right-14 bg-red-600 text-white font-bold w-9 h-9 rounded-full flex items-center justify-center text-xl hover:bg-red-500 transition z-10"
               aria-label="Remove from list"
               title="Remove from list"
@@ -77,11 +94,11 @@ const MovieModal = ({ movie, onClose, onRemove }) => {
           {movie.poster && movie.poster !== 'N/A' ? (
             <img
               src={movie.poster}
-              alt={movie.title}
+              alt={`${movie.title} poster`}
               className="w-full md:w-52 object-cover flex-shrink-0 rounded-t-2xl md:rounded-l-2xl md:rounded-tr-none"
             />
           ) : (
-            <div className="w-full md:w-52 bg-gray-800 flex items-center justify-center text-6xl flex-shrink-0 py-12 rounded-t-2xl md:rounded-l-2xl md:rounded-tr-none">
+            <div className="w-full md:w-52 bg-gray-800 flex items-center justify-center text-6xl flex-shrink-0 py-12 rounded-t-2xl md:rounded-l-2xl md:rounded-tr-none" aria-label="No poster available">
               🎬
             </div>
           )}
@@ -148,11 +165,35 @@ const MovieModal = ({ movie, onClose, onRemove }) => {
         </div>
       </div>
 
+      {/* Confirm remove dialog */}
+      {confirmRemove && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+          <div className="bg-gray-900 border border-gray-700 rounded-2xl p-6 max-w-xs text-center flex flex-col gap-4">
+            <p className="text-white font-bold">Remove this movie?</p>
+            <p className="text-gray-400 text-sm">This will remove it from the list. If it's the last movie, the list will be deleted.</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => { setConfirmRemove(false); onRemove(); }}
+                className="flex-1 bg-red-600 text-white font-bold py-2 rounded-lg hover:bg-red-500 transition text-sm"
+              >
+                Remove
+              </button>
+              <button
+                onClick={() => setConfirmRemove(false)}
+                className="flex-1 bg-gray-800 text-gray-300 py-2 rounded-lg hover:bg-gray-700 transition text-sm"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Add to list popup */}
       {showAddToList && (
         <AddToListPopup
           movieId={movieId}
-          onClose={() => setShowAddToList(false)}
+          onClose={() => { setShowAddToList(false); onClose(); }}
         />
       )}
     </>

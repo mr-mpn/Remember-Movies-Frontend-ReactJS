@@ -138,7 +138,7 @@ const Lists = () => {
       </p>
 
       {/* Search bar */}
-      <form onSubmit={handleSearch} className="flex w-full max-w-xl gap-3 mb-8">
+      <form onSubmit={handleSearch} className="flex flex-col sm:flex-row w-full max-w-xl gap-3 mb-8">
         <input
           type="text"
           value={query}
@@ -161,7 +161,7 @@ const Lists = () => {
       )}
 
       {/* Movie modal */}
-      {movie && <MovieModal movie={movie} onClose={() => { setMovie(null); fetchLists(); }} />}
+      {movie && <MovieModal movie={movie} onClose={() => { setMovie(null); setQuery(''); fetchLists(); }} />}
 
       {/* User's lists */}
       <div className="w-full mt-8">
@@ -187,7 +187,7 @@ const Lists = () => {
                 <div className="px-4 py-3">
                   <h4 className="text-white font-bold text-sm line-clamp-1">{list.name}</h4>
                   <p className="text-gray-400 text-xs line-clamp-1 mt-1">{list.description}</p>
-                  <p className="text-gray-600 text-xs mt-2">{daysAgo(list.createdAt)}</p>
+                  <p className="text-gray-500 text-xs mt-2">{daysAgo(list.createdAt)}</p>
                 </div>
               </div>
             ))}

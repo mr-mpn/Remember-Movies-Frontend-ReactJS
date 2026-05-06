@@ -10,6 +10,7 @@ const AddToListPopup = ({ movieId, onClose }) => {
   const [creating, setCreating] = useState(false)
   const [newName, setNewName] = useState('')
   const [newDesc, setNewDesc] = useState('')
+  const [newPublic, setNewPublic] = useState(true)
   const [feedback, setFeedback] = useState(null)
 
   // Fetch user's lists
@@ -33,7 +34,7 @@ const AddToListPopup = ({ movieId, onClose }) => {
       )
       if (res.data?.success) {
         setFeedback('Added!')
-        setTimeout(onClose, 800)
+        setTimeout(onClose, 1500)
       }
     } catch (err) {
       const msg = err.response?.data?.error?.message || 'Failed to add'
@@ -49,12 +50,12 @@ const AddToListPopup = ({ movieId, onClose }) => {
     try {
       const res = await axios.post(
         `${API}/lists`,
-        { name: newName, description: newDesc, isPublic: false, movieId },
+        { name: newName, description: newDesc, isPublic: newPublic, movieId },
         { headers: { Authorization: `Bearer ${token}` } }
       )
       if (res.data?.success) {
         setFeedback('List created!')
-        setTimeout(onClose, 800)
+        setTimeout(onClose, 1500)
       }
     } catch (err) {
       const msg = err.response?.data?.error?.message || 'Failed to create list'
@@ -120,6 +121,18 @@ const AddToListPopup = ({ movieId, onClose }) => {
                   placeholder="Description"
                   className="bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
                 />
+                <div className="flex items-center gap-3">
+                  <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-300">
+                    <input
+                      type="checkbox"
+                      checked={!newPublic}
+                      onChange={(e) => setNewPublic(!e.target.checked)}
+                      className="w-4 h-4 accent-yellow-400 rounded"
+                    />
+                    Private list
+                  </label>
+                  <span className="text-gray-500 text-xs">{newPublic ? '(anyone can view)' : '(only you)'}</span>
+                </div>
                 <div className="flex gap-2">
                   <button
                     type="submit"
